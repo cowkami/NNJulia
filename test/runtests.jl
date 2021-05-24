@@ -2,6 +2,7 @@ using Test
 
 include("../src/Function.jl")
 include("../src/Layer.jl")
+include("../src/Network.jl")
 
 @testset "Test sigmoid function" begin
     @testset "check values" begin
@@ -19,6 +20,7 @@ include("../src/Layer.jl")
     end
 end
 
+        
 @testset "Test Sigmoid layer" begin
     sig = Layer.Sigmoid()
     @test Layer.forward(sig, [0.]) == [0.5]
@@ -31,8 +33,21 @@ end
         [
             0. 1. 0.5;
             1. 0. 0.5;
-        ],  # W
-        [1., 0.5, -1.]   # b
+        ],  # Weights
+        [1., 0.5, -1.]   # bias
     )
     @test isapprox(Layer.forward(afn, [0.2, -0.9]), [0.1, 0.7, -1.35])
+end
+
+
+@testset "Test TwoLayerNet" begin
+    net = Network.TwoLayerNet(3, 10, 5)
+    x = [3., 0., 0.1]
+    X = [
+        3. 0.9;
+        0. 3.;
+        0.1 0.1
+    ]
+    @test size(Network.predict(net, x)) == (5,)
+    @test size(Network.predict(net, X)) == (5, 2)
 end
