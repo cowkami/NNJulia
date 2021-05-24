@@ -6,7 +6,10 @@ include("Function.jl")
 
 abstract type AbstractLayer end
 
-struct Sigmoid <: AbstractLayer end
+struct Sigmoid <: AbstractLayer
+    params::Array{VecOrMat{<:Real}, 1}
+    Sigmoid() = new([])
+end
 
 function forward(
     _::Sigmoid,
@@ -16,9 +19,15 @@ function forward(
 end
 
 
-struct Affine <: AbstractLayer
+mutable struct Affine <: AbstractLayer
     W::Matrix{<:Real}
     b::Vector{<:Real}
+    params::Array{VecOrMat{<:Real}, 1}
+    function Affine(W::Matrix{<:Real}, b::Vector{<:Real})::Affine
+        layer = new(W, b, [])
+        layer.params = [layer.W, layer.b]
+        return layer
+    end
 end
 
 function forward(
