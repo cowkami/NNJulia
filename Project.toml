@@ -1,0 +1,4 @@
+name = "NNJulia"
+uuid = "dcaf866c-db58-42ca-8ae8-c80404fe9fa3"
+authors = ["lee unseo <lee.unseo17@gmail.com>"]
+version = "0.1.0"
