@@ -6,27 +6,39 @@ include("Function.jl")
 
 abstract type AbstractLayer end
 
-struct Sigmoid <: AbstractLayer
-    parameters::Array{VecOrMat{<:Real},1}
-    Sigmoid() = new([])
+
+mutable struct Sigmoid <: AbstractLayer
+    params::Array{VecOrMat{<:Real},1}
+    grads::VecOrMat{<:Real}
+    out::VecOrMat{<:Real}
+    function Sigmoid()
+        new(VecOrMat{<:Real}[], Real[], Real[])
+    end
 end
 
 function forward(
-    _::Sigmoid,
+    L::Sigmoid,
     x::VecOrMat{<:Real}
 )::VecOrMat{<:Real}
-    Function.sigmoid.(x)
+    L.out = Function.sigmoid.(x)
+    L.out
 end
 
 
 mutable struct Affine <: AbstractLayer
     W::Matrix{<:Real}
     b::Vector{<:Real}
-    parameters::Array{VecOrMat{<:Real},1}
+    params::Array{VecOrMat{<:Real},1}
+    grads::VecOrMat{<:Real}
+    out::VecOrMat{<:Real}
     function Affine(W::Matrix{<:Real}, b::Vector{<:Real})::Affine
-        layer = new(W, b, [])
-        layer.parameters = [layer.W, layer.b]
-        return layer
+        new(
+            W,
+            b,
+            [W, b],
+            zeros(size(b)),
+            zeros(size(b))
+        )
     end
 end
 
@@ -34,7 +46,26 @@ function forward(
     L::Affine,
     x::VecOrMat{<:Real}
 )::VecOrMat{<:Real}
-    L.W' * x .+ L.b
+    L.out = L.W' * x .+ L.b
+    return L.out
+end
+
+
+mutable struct Softmax <: AbstractLayer
+    params::Array{VecOrMat{<:Real},1}
+    grads::VecOrMat{<:Real}
+    out::VecOrMat{<:Real}
+    function Softmax()
+        new(VecOrMat{<:Real}[], Real[], Real[])
+    end
+end
+
+function forward(
+    L::Softmax,
+    x::VecOrMat{<:Real}
+)::VecOrMat{<:Real}
+    L.out = Function.softmax(x)
+    L.out
 end
 
 
